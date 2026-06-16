@@ -1,6 +1,7 @@
 import os
 import sys
 import pygame as pg
+import random
 
 
 WIDTH, HEIGHT = 1100, 650
@@ -15,6 +16,18 @@ def main():
     kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
     kk_rct = kk_img.get_rect()
     kk_rct.center = 300, 200
+
+    #爆弾の初期化
+    bb_img = pg.Surface((20,20))
+    pg.draw.circle(bb_img,(255,0,0),(10,10),10)  #半径10の赤円
+    bb_img.set_colorkey((0,0,0))  
+    
+    bb_rct = bb_img.get_rect()
+    bb_rct.centerx = random.randint(0,WIDTH)
+    bb_rct.centery = random.randint(0,HEIGHT)
+    vx,vy = 5,5
+
+
     clock = pg.time.Clock()
     tmr = 0
     while True:
@@ -22,7 +35,7 @@ def main():
             if event.type == pg.QUIT: 
                 return
         screen.blit(bg_img, [0, 0]) 
-
+        #こうかとん移動
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
         for key,mv in DELTA.items():
@@ -30,8 +43,12 @@ def main():
                 sum_mv[0] += mv[0]
                 sum_mv[1] += mv[1]
         kk_rct.move_ip(sum_mv)
-    
+        
+        #爆弾blit、移動
         screen.blit(kk_img, kk_rct)
+        bb_rct.move_ip(vx,vy)
+        screen.blit(bb_img,bb_rct)
+
         pg.display.update()
         tmr += 1
         clock.tick(50)
