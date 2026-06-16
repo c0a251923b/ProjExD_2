@@ -68,7 +68,29 @@ def init_bb_imgs() -> tuple[list[pg.Surface],list[int]]:
     bb_accs = [a for a in range(1, 11)]
     return bb_imgs, bb_accs
 
-#演習3飛ぶ方向に
+#演習3飛ぶ方向にこうかとん画像処理
+def get_kk_imgs(kk_img: pg.surface) -> dict[tuple[int,int],pg.Surface]:
+    """
+    こうかとんの方向転換
+    引数:kk_img
+    戻り値:こうかとんの方向を保存した辞書
+    """
+    img0 = kk_img # 左向き
+    img1 = pg.transform.flip(img0, True, False) #右向き
+    kk_dict = {
+    ( 0, 0): pg.transform.rotozoom(img1, 0, 1.0), # 初期
+    (+5, 0): pg.transform.rotozoom(img1, 0, 1.0), # 右
+    (+5, -5): pg.transform.rotozoom(img1, 45, 1.0), # 右上
+    ( 0, -5): pg.transform.rotozoom(img1, 90, 1.0), # 上
+    (-5, -5): pg.transform.rotozoom(img0, -45, 1.0), # 左上
+    (-5, 0): pg.transform.rotozoom(img0, 0, 1.0), # 左
+    (-5, +5): pg.transform.rotozoom(img0, 45, 1.0), # 左下
+    ( 0, +5): pg.transform.rotozoom(img1, -90, 1.0), # 下
+    (+5, +5): pg.transform.rotozoom(img1, -45, 1.0), # 右下
+
+    }
+    return kk_dict
+
 
 
 
@@ -77,8 +99,12 @@ def init_bb_imgs() -> tuple[list[pg.Surface],list[int]]:
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
-    bg_img = pg.image.load("fig/pg_bg.jpg")    
+    bg_img = pg.image.load("fig/pg_bg.jpg")  
+
+    #こうかとん  
     kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
+    kk_img0 = pg.image.load("fig/3.png")  #読み込み
+    kk_imgs = get_kk_imgs(kk_img0)  #初期画像
     kk_rct = kk_img.get_rect()
     kk_rct.center = 300, 200
 
@@ -128,6 +154,10 @@ def main():
         #こうかとん画面外処理
         if check_bound(kk_rct) != (True,True):  #画面外なので動きをキャンセル
             kk_rct.move_ip(-sum_mv[0],-sum_mv[1])
+
+        #辞書から取り出し
+        kk_img = kk_imgs[tuple(sum_mv)]
+        
         screen.blit(kk_img, kk_rct)
 
 
