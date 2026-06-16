@@ -59,6 +59,16 @@ def init_bb_imgs() -> tuple[list[pg.Surface],list[int]]:
     引数:Surface
     返り値:爆弾の大きさ、速さ
     """
+    bb_imgs=[]
+    for r in range(1, 11):
+        bb_img = pg.Surface((20*r, 20*r))
+        pg.draw.circle(bb_img, (255, 0, 0), (10*r, 10*r), 10*r)
+        bb_img.set_colorkey((0, 0, 0))
+        bb_imgs.append(bb_img)
+    bb_accs = [a for a in range(1, 11)]
+    return bb_imgs, bb_accs
+
+#演習3飛ぶ方向に
 
 
 
@@ -77,10 +87,15 @@ def main():
     pg.draw.circle(bb_img,(255,0,0),(10,10),10)  #半径10の赤円
     bb_img.set_colorkey((0,0,0))  
     
+    #爆弾の挙動
+    bb_imgs,bb_accs = init_bb_imgs()  
+    bb_img = bb_imgs[0]
     bb_rct = bb_img.get_rect()
     bb_rct.centerx = random.randint(0,WIDTH)
     bb_rct.centery = random.randint(0,HEIGHT)
     vx,vy = 5,5
+
+    
 
 
     clock = pg.time.Clock()
@@ -94,6 +109,14 @@ def main():
             gameover(screen)  #ゲームオーバー画面表示
             return 
         screen.blit(bg_img, [0, 0]) 
+
+
+        #爆弾加速,拡大
+        avx = vx*bb_accs[min(tmr//500, 9)] #このavxとavyをmove_ipメソッドに渡す
+        avy = vy*bb_accs[min(tmr//500, 9)]
+        bb_img = bb_imgs[min(tmr//500, 9)]
+        bb_rct.move_ip(avx, avy)
+
         #こうかとん移動
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
