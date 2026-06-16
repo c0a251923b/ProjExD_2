@@ -207,6 +207,7 @@ def main():
         if not tate:
             vy *= -1    
 
+        #爆弾画面表示
         screen.blit(bb_img,bb_rct)
 
 
