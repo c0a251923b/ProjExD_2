@@ -2,6 +2,7 @@ import os
 import sys
 import pygame as pg
 import random
+import time
 
 
 WIDTH, HEIGHT = 1100, 650
@@ -24,6 +25,44 @@ def check_bound(rct:pg.Rect) -> tuple[bool,bool]:
     if rct.top<0 or HEIGHT < rct.bottom:
         tate = False
     return yoko,tate
+
+#演習1ゲームオーバー画面
+def gameover(screen:pg.Surface) -> None:
+    """
+    引数:スクリーンSurface
+    戻り値:None
+    ゲームオーバーの画面作成
+    """
+
+    black_screen = pg.Surface((WIDTH,HEIGHT))#黒surface
+    pg.draw.rect(black_screen,(0,0,0),(0,0,WIDTH,HEIGHT))
+    black_screen.set_alpha(200)#透明度
+
+    #Game Over 文字表示処理
+    font = pg.font.Font(None,80)
+    txt = font.render("Game Over",True,(255,255,255))
+    black_screen.blit(txt,[400,300])
+    #こうかとん（悲しい）画面表示
+    kk_cry_img = pg.image.load("fig/8.png")
+    black_screen.blit(kk_cry_img,[330,290])
+    black_screen.blit(kk_cry_img,[730,290])
+
+    screen.blit(black_screen,[0,0])
+    pg.display.update()#画面再読み込み
+    time.sleep(5)#5秒停止
+    return
+
+#演習2時間とともに爆弾が拡大、加速する
+def init_bb_imgs() -> tuple[list[pg.Surface],list[int]]:
+    """
+    時間とともに爆弾が拡大，加速する関数
+    引数:Surface
+    返り値:爆弾の大きさ、速さ
+    """
+
+
+
+
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
@@ -52,7 +91,8 @@ def main():
                 return
         #爆弾と当たると終了    
         if kk_rct.colliderect(bb_rct):
-            return
+            gameover(screen)  #ゲームオーバー画面表示
+            return 
         screen.blit(bg_img, [0, 0]) 
         #こうかとん移動
         key_lst = pg.key.get_pressed()
