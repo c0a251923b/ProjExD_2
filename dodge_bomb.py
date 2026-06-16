@@ -50,6 +50,9 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT: 
                 return
+        #爆弾と当たると終了    
+        if kk_rct.colliderect(bb_rct):
+            return
         screen.blit(bg_img, [0, 0]) 
         #こうかとん移動
         key_lst = pg.key.get_pressed()
@@ -64,6 +67,7 @@ def main():
             kk_rct.move_ip(-sum_mv[0],-sum_mv[1])
         screen.blit(kk_img, kk_rct)
 
+
         bb_rct.move_ip(vx,vy)
         #爆弾画面外処理
         yoko,tate = check_bound(bb_rct)
@@ -74,6 +78,8 @@ def main():
 
         screen.blit(bb_img,bb_rct)
 
+
+        
         pg.display.update()
         tmr += 1
         clock.tick(50)
