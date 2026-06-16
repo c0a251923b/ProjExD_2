@@ -3,6 +3,7 @@ import sys
 import pygame as pg
 import random
 import time
+import math
 
 
 WIDTH, HEIGHT = 1100, 650
@@ -91,6 +92,34 @@ def get_kk_imgs(kk_img: pg.surface) -> dict[tuple[int,int],pg.Surface]:
     }
     return kk_dict
 
+#4.爆弾追尾
+def calc_orientation(
+    org: pg.Rect,
+    dst: pg.Rect,
+    current_xy: tuple[float, float]) -> tuple[float, float]:
+    """
+    爆弾からこうかとんへの方向ベクトルを計算する
+    引数：
+    org: 爆弾Rect
+    dst: こうかとんRect
+    current_xy: 現在の速度ベクトル
+    戻り値：
+    正規化された方向ベクトル
+    """
+    dx = dst.centerx - org.centerx
+    dy = dst.centery - org.centery
+    dist = math.sqrt(dx**2 + dy**2)
+    # 近すぎるときはそのまま
+    if dist < 300:
+        return current_xy
+    #正規化（長さ√50 ≒ 7.07）
+    if dist != 0:
+        dx = dx / dist * 7
+        dy = dy / dist * 7
+    return dx, dy
+
+
+
 
 
 
@@ -141,6 +170,10 @@ def main():
         avx = vx*bb_accs[min(tmr//500, 9)] #このavxとavyをmove_ipメソッドに渡す
         avy = vy*bb_accs[min(tmr//500, 9)]
         bb_img = bb_imgs[min(tmr//500, 9)]
+        center = bb_rct.center
+        bb_rct.width = bb_img.get_rect().width
+        bb_rct.height = bb_img.get_rect().height
+        bb_rct.center = center
         bb_rct.move_ip(avx, avy)
 
         #こうかとん移動
@@ -157,11 +190,16 @@ def main():
 
         #辞書から取り出し
         kk_img = kk_imgs[tuple(sum_mv)]
+
+        #追尾
+        vx, vy = calc_orientation(bb_rct, kk_rct, (vx, vy))
         
+        
+        #表示
         screen.blit(kk_img, kk_rct)
 
 
-        bb_rct.move_ip(vx,vy)
+    
         #爆弾画面外処理
         yoko,tate = check_bound(bb_rct)
         if not yoko:
